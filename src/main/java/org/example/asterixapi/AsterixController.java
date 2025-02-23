@@ -11,52 +11,37 @@ import java.util.Optional;
 
 public class AsterixController {
 
-    private final CharacterRepo characterRepo;
+    private final CharacterService characterService;
 
-    public AsterixController(CharacterRepo characterRepo) {
-        this.characterRepo = characterRepo;
+    public AsterixController(CharacterService characterService) {
+        this.characterService = characterService;
     }
 
     @GetMapping
     public List<Character> getAllCharacters() {
-        return characterRepo.findAll();
+        return characterService.getAllCharacters();
+    }
+    @GetMapping("/{id}")
+    public Character getCharacterById(@PathVariable String id) {
+        return characterService.getCharacterById(id);
     }
 
 
+
     @PostMapping
-    public Character addCharacter(@RequestBody Character character) {
-        return characterRepo.save(character);
+    public Character addCharacter(@RequestBody CharacterDTO characterDTO) {
+        return characterService.addCharacter(characterDTO);
     }
 
     @PostMapping("/{id}")
     public Character updateCharacter(@PathVariable String id, @RequestBody Character updatedCharacter) {
-
-        Optional<Character> optionalCharacter = characterRepo.findById(id);
-
-        if (optionalCharacter.isPresent()) {
-            Character existingCharacter = optionalCharacter.get();
-            Character newCharacter = new Character(
-                    existingCharacter.id(),
-                    updatedCharacter.name(),
-                    updatedCharacter.age(),
-                    updatedCharacter.profession()
-            );
-            return characterRepo.save(newCharacter);
-        } else {
-            throw new IllegalArgumentException("Character with ID " + id + " not found");
-        }
+return characterService.updateCharacter(id, updatedCharacter);
     }
 
     @DeleteMapping("/{id}")
     public void deleteCharacter(@PathVariable String id) {
-        characterRepo.deleteById(id);
+        characterService.deleteCharacter(id);
 
     }
-
-    @PostMapping("/bulk")
-    public List<Character> addCharacters(@RequestBody List<Character> characters) {
-        return characterRepo.saveAll(characters);
-    }
-
 
 }
